@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F5F5F5;
+            color: #1D3557;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #1D3557;
+        }
+        .section {
+            background-color: #A1C6EA;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        textarea, input[type="text"], input[type="number"] {
+            width: 100%;
+            border: 1px solid #1D3557;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #1D3557;
+            color: #FFFFFF;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #123456;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #1D3557;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #1D3557;
+            color: #FFFFFF;
+        }
+        tr:nth-child(even) {
+            background-color: #A1C6EA;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #1D3557;
+            border-radius: 4px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Page</h1>
+
+    <div class="section">
+        <h2>Add Account</h2>
+        <form action="/admin/action" method="POST">
+            <textarea name="accountDetails" placeholder="Enter account details..."></textarea>
+            <div class="form-group">
+                <label for="accountProductSelect">Select Product:</label>
+                <select name="product" id="accountProductSelect">
+                    <% products.forEach(product => { %>
+                        <option value="<%= product.shortId %>"><%= product.title %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <input type="hidden" name="action" value="addAccount">
+            <button type="submit">Add Account</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>Delete Account</h2>
+        <form action="/admin/action" method="POST">
+            <textarea name="accountDetails" placeholder="Enter account details to delete..."></textarea>
+            <input type="hidden" name="action" value="deleteAccount">
+            <button type="submit">Delete Account</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>Create Product</h2>
+        <form action="/admin/action" method="POST">
+            <div class="form-group">
+                <label for="productTitle">Product Title:</label>
+                <input type="text" name="title" id="productTitle" placeholder="Enter product title...">
+            </div>
+            <div class="form-group">
+                <label for="minBuy">Min Buy:</label>
+                <input type="number" name="minBuy" id="minBuy" placeholder="Enter minimum buy...">
+            </div>
+            <div class="form-group">
+                <label for="maxBuy">Max Buy:</label>
+                <input type="number" name="maxBuy" id="maxBuy" placeholder="Enter maximum buy...">
+            </div>
+            <input type="hidden" name="action" value="addProduct">
+            <button type="submit">Create Product</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>Select Product and Action</h2>
+        <form id="actionForm" action="/admin/action" method="POST">
+            <div class="form-group">
+                <label for="productSelect">Select Product:</label>
+                <select name="product" id="productSelect">
+                    <% products.forEach(product => { %>
+                        <option value="<%= product.shortId %>"><%= product.title %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="actionSelect">Select Action:</label>
+                <select name="action" id="actionSelect" onchange="toggleEditInputs()">
+                    <option value="edit" selected>Edit</option>
+                    <option value="delete">Delete</option>
+                </select>
+            </div>
+            <div id="editInputs">
+                <div class="form-group">
+                    <label for="editProductTitle">New Product Title:</label>
+                    <input type="text" name="title" id="editProductTitle" placeholder="Enter new product title...">
+                </div>
+                <div class="form-group">
+                    <label for="editMinBuy">Min Buy:</label>
+                    <input type="number" name="minBuy" id="editMinBuy" placeholder="Enter minimum buy...">
+                </div>
+                <div class="form-group">
+                    <label for="editMaxBuy">Max Buy:</label>
+                    <input type="number" name="maxBuy" id="editMaxBuy" placeholder="Enter maximum buy...">
+                </div>
+            </div>
+            <button type="submit">Perform Action</button>
+        </form>
+    </div>
+
+    <h2>Data Table</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Short ID</th>
+                <th>Is Buy</th>
+                <th>ID Tele</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% accounts.forEach(account => { %>
+                <tr>
+                    <td><%= account.shortId %></td>
+                    <td><%= account.isBuy %></td>
+                    <td><%= account.idTele %></td>
+                    <td><%= account.data %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+    <script>
+        function toggleEditInputs() {
+            const action = document.getElementById('actionSelect').value;
+            const editInputs = document.getElementById('editInputs');
+            if (action === 'edit') {
+                editInputs.classList.remove('hidden');
+            } else {
+                editInputs.classList.add('hidden');
+            }
+        }
+
+        // Example function to add data to the table
+        function addDataToTable(shortId, isBuy, idTele) {
+            const table = document.getElementById('dataTable');
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${shortId}</td><td>${isBuy}</td><td>${idTele}</td>`;
+            table.appendChild(row);
+        }
+
+        // Example data
+        addDataToTable('12345', 'Yes', '987654321');
+        addDataToTable('67890', 'No', '123456789');
+
+        // Ensure the edit inputs are visible by default
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleEditInputs();
+        });
+    </script>
+</body>
+</html>
